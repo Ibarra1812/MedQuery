@@ -52,7 +52,7 @@ DB_PATH     = ROOT_DIR / "db"
 
 # ─── Configuración del modelo ─────────────────────────────────────────────────
 EMBED_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
-GROQ_MODEL  = os.getenv("GROQ_MODEL_NAME", "llama3-8b-8192")
+GROQ_MODEL  = os.getenv("GROQ_MODEL_NAME", "llama-3.1-8b-instant")
 TOP_K       = 4   # chunks a recuperar por consulta
 TEMPERATURE = 0.1 # baja temperatura: respuestas deterministas y precisas
 
