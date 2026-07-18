@@ -1,8 +1,9 @@
 # ── Variables de entorno (NUNCA subir al repo) ────────────────────────────────
 .env
 
-# ── Índice FAISS generado localmente ─────────────────────────────────────────
-db/
+# ── Índice FAISS: NO excluir — debe estar en el repo para Streamlit Cloud ─────
+# db/   ← comentado intencionalmente: el índice es estático y debe versionarse
+db/.gitkeep
 
 # ── Caché de modelos HuggingFace ─────────────────────────────────────────────
 .cache/
@@ -19,5 +20,5 @@ venv/
 .venv/
 env/
 
-# ── Streamlit ─────────────────────────────────────────────────────────────────
+# ── Streamlit secrets (NUNCA subir — configurar en el dashboard de Cloud) ─────
 .streamlit/secrets.toml

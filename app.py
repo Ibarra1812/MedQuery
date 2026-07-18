@@ -3,7 +3,14 @@ MedQuery AI — Asistente Clínico RAG
 app.py | Frontend principal (Streamlit)
 """
 
+import sys
+from pathlib import Path
+
+# Permite importar desde src/ sin instalar el paquete
+sys.path.insert(0, str(Path(__file__).parent))
+
 import streamlit as st
+from src.rag_chain import load_rag_resources, get_source_label
 
 # ──────────────────────────────────────────────────────────────────────────────
 # CONFIGURACIÓN DE PÁGINA
@@ -142,16 +149,29 @@ st.markdown(
 )
 
 # ──────────────────────────────────────────────────────────────────────────────
+# CARGA DEL BACKEND RAG — una sola vez por sesion del servidor
+# ──────────────────────────────────────────────────────────────────────────────
+@st.cache_resource(show_spinner="Cargando base de conocimiento clínica...")
+def get_rag_chain():
+    """Carga embeddings + FAISS + Groq chain. Se ejecuta una sola vez."""
+    try:
+        chain, doc_names = load_rag_resources()
+        return chain, doc_names, True
+    except Exception as e:
+        return None, [], False
+
+
+rag_chain, loaded_docs, rag_ok = get_rag_chain()
+
+# ──────────────────────────────────────────────────────────────────────────────
 # ESTADO DE SESIÓN — historial de chat
 # ──────────────────────────────────────────────────────────────────────────────
 if "messages" not in st.session_state:
     st.session_state.messages = []          # lista de dicts {role, content, ref}
 
-if "rag_ready" not in st.session_state:
-    st.session_state.rag_ready = False      # se pondrá True cuando el backend esté cargado
-
-if "docs_loaded" not in st.session_state:
-    st.session_state.docs_loaded = []       # nombres de PDFs indexados
+# Sincronizar estado del RAG con la sidebar
+st.session_state.rag_ready   = rag_ok
+st.session_state.docs_loaded = loaded_docs
 
 # ──────────────────────────────────────────────────────────────────────────────
 # SIDEBAR — Estado del sistema
@@ -350,23 +370,39 @@ st.markdown(
 )
 
 # ──────────────────────────────────────────────────────────────────────────────
-# LÓGICA PROVISIONAL — se reemplazará en el Paso 4 con el RAG real
+# LÓGICA RAG — Retriever + Groq + respuesta al usuario
 # ──────────────────────────────────────────────────────────────────────────────
 if submitted and user_query.strip():
-    # Guardar mensaje del usuario
+    # Guardar mensaje del usuario en el historial
     st.session_state.messages.append({"role": "user", "content": user_query})
 
-    # Placeholder: respuesta stub hasta que el backend RAG esté conectado
-    stub_response = (
-        "⚙️ <em>Backend RAG aún no conectado.</em> "
-        "Esta respuesta es un marcador provisional. "
-        "El agente responderá aquí una vez integrado el Retriever y la API de Groq (Paso 4)."
-    )
-    st.session_state.messages.append(
-        {
+    if not rag_ok or rag_chain is None:
+        # Backend no disponible — mensaje de error claro
+        st.session_state.messages.append({
             "role": "assistant",
-            "content": stub_response,
-            "ref": "Pendiente — Paso 4",
-        }
-    )
+            "content": "⚠️ La base de conocimiento no está disponible. "
+                       "Verifica que el índice FAISS esté generado en <code>db/</code>.",
+            "ref": "",
+        })
+    else:
+        # Invocar la cadena RAG con spinner
+        with st.spinner("Consultando protocolos clínicos..."):
+            try:
+                result = rag_chain.invoke({"input": user_query})
+                answer       = result.get("answer", "Sin respuesta generada.")
+                context_docs = result.get("context", [])
+                source_ref   = get_source_label(context_docs)
+
+                st.session_state.messages.append({
+                    "role":    "assistant",
+                    "content": answer,
+                    "ref":     source_ref,
+                })
+            except Exception as e:
+                st.session_state.messages.append({
+                    "role":    "assistant",
+                    "content": f"❌ Error al procesar la consulta: <code>{e}</code>",
+                    "ref":     "",
+                })
+
     st.rerun()
