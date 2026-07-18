@@ -155,22 +155,17 @@ def _get_indexed_doc_names() -> list[str]:
 # API PUBLICA — llamada desde app.py
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def load_rag_resources() -> tuple:
+class CustomRAGChain:
     """
-    Carga todos los recursos RAG y devuelve un callable con la misma
-    interfaz que un chain de LangChain:
-
-        result = chain({"input": "pregunta"})
-        result["answer"]  -> str con la respuesta
-        result["context"] -> list[Document] con los chunks recuperados
-
-    Disenado para @st.cache_resource en app.py (se ejecuta una sola vez).
+    Envoltura personalizada para compatibilidad con la interfaz Runnable de LangChain.
+    Permite llamar a .invoke() como se espera en app.py.
     """
-    embeddings  = _load_embeddings()
-    vectorstore = _load_vectorstore(embeddings)
-    retriever, llm, prompt = _build_components(vectorstore)
+    def __init__(self, retriever, llm, prompt):
+        self.retriever = retriever
+        self.llm       = llm
+        self.prompt    = prompt
 
-    def chain_invoke(inputs: dict) -> dict:
+    def invoke(self, inputs: dict) -> dict:
         """
         Orquesta manualmente el pipeline RAG:
           1. Recuperar chunks relevantes con FAISS
@@ -180,19 +175,30 @@ def load_rag_resources() -> tuple:
           5. Devolver respuesta + documentos fuente
         """
         query   = inputs["input"]
-        docs    = retriever.invoke(query)
+        docs    = self.retriever.invoke(query)
         context = "\n\n".join(doc.page_content for doc in docs)
 
-        messages = prompt.format_messages(context=context, input=query)
-        response = llm.invoke(messages)
+        messages = self.prompt.format_messages(context=context, input=query)
+        response = self.llm.invoke(messages)
 
         return {
             "answer":  response.content,
             "context": docs,
         }
 
+
+def load_rag_resources() -> tuple:
+    """
+    Carga todos los recursos RAG y devuelve un CustomRAGChain listo para .invoke().
+    Disenado para @st.cache_resource en app.py (se ejecuta una sola vez).
+    """
+    embeddings  = _load_embeddings()
+    vectorstore = _load_vectorstore(embeddings)
+    retriever, llm, prompt = _build_components(vectorstore)
+
+    chain     = CustomRAGChain(retriever, llm, prompt)
     doc_names = _get_indexed_doc_names()
-    return chain_invoke, doc_names
+    return chain, doc_names
 
 
 def get_source_label(context_docs: list) -> str:
