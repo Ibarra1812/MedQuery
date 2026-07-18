@@ -41,8 +41,7 @@ def _get_secret(key: str, default: str = "") -> str:
 from langchain_community.vectorstores import FAISS
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
-from langchain.chains import create_retrieval_chain
-from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain_huggingface import HuggingFaceEmbeddings
 
 warnings.filterwarnings("ignore")
 load_dotenv()
@@ -104,8 +103,17 @@ def _load_vectorstore(embeddings: HuggingFaceEmbeddings) -> FAISS:
     )
 
 
-def _build_chain(vectorstore: FAISS):
-    """Construye la cadena RAG completa: retriever → prompt → LLM."""
+def _build_components(vectorstore: FAISS) -> tuple:
+    """
+    Construye y devuelve los tres componentes RAG por separado:
+      - retriever : busca los k chunks mas relevantes en FAISS
+      - llm       : ChatGroq con Llama 3
+      - prompt    : template clinico con {context} e {input}
+
+    Usamos componentes separados (en lugar de una cadena LangChain)
+    para compatibilidad total con LangChain 1.x donde langchain.chains
+    fue eliminado del paquete principal.
+    """
     retriever = vectorstore.as_retriever(
         search_type="similarity",
         search_kwargs={"k": TOP_K},
@@ -122,10 +130,7 @@ def _build_chain(vectorstore: FAISS):
         ("human", "{input}"),
     ])
 
-    qa_chain  = create_stuff_documents_chain(llm, prompt)
-    rag_chain = create_retrieval_chain(retriever, qa_chain)
-
-    return rag_chain
+    return retriever, llm, prompt
 
 
 def _get_indexed_doc_names() -> list[str]:
@@ -152,18 +157,42 @@ def _get_indexed_doc_names() -> list[str]:
 
 def load_rag_resources() -> tuple:
     """
-    Carga todos los recursos RAG en el orden correcto.
-    Diseñado para usarse con @st.cache_resource en app.py (se ejecuta una sola vez).
+    Carga todos los recursos RAG y devuelve un callable con la misma
+    interfaz que un chain de LangChain:
 
-    Returns:
-        chain     (Runnable)  — cadena RAG lista para invocar
-        doc_names (list[str]) — nombres de PDFs indexados (para la sidebar)
+        result = chain({"input": "pregunta"})
+        result["answer"]  -> str con la respuesta
+        result["context"] -> list[Document] con los chunks recuperados
+
+    Disenado para @st.cache_resource en app.py (se ejecuta una sola vez).
     """
     embeddings  = _load_embeddings()
     vectorstore = _load_vectorstore(embeddings)
-    chain       = _build_chain(vectorstore)
-    doc_names   = _get_indexed_doc_names()
-    return chain, doc_names
+    retriever, llm, prompt = _build_components(vectorstore)
+
+    def chain_invoke(inputs: dict) -> dict:
+        """
+        Orquesta manualmente el pipeline RAG:
+          1. Recuperar chunks relevantes con FAISS
+          2. Formatear contexto como texto plano
+          3. Inyectar en el prompt clinico
+          4. Invocar Groq LLM
+          5. Devolver respuesta + documentos fuente
+        """
+        query   = inputs["input"]
+        docs    = retriever.invoke(query)
+        context = "\n\n".join(doc.page_content for doc in docs)
+
+        messages = prompt.format_messages(context=context, input=query)
+        response = llm.invoke(messages)
+
+        return {
+            "answer":  response.content,
+            "context": docs,
+        }
+
+    doc_names = _get_indexed_doc_names()
+    return chain_invoke, doc_names
 
 
 def get_source_label(context_docs: list) -> str:
