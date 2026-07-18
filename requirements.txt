@@ -1,0 +1,22 @@
+# ── Interfaz ──────────────────────────────────────────────────────────────────
+streamlit>=1.35.0
+
+# ── LangChain Core (paquetes modernos, sin langchain-community deprecated) ────
+langchain>=1.3.0
+langchain-core>=1.4.0
+langchain-text-splitters>=1.1.0
+langchain-groq>=0.1.0
+
+# ── Embeddings (paquete standalone moderno) ───────────────────────────────────
+langchain-huggingface>=0.1.0
+sentence-transformers>=3.0.0
+
+# ── Vector Store ──────────────────────────────────────────────────────────────
+langchain-community>=0.2.0   # solo para FAISS; pendiente migración futura
+faiss-cpu>=1.8.0
+
+# ── Procesamiento de PDFs ─────────────────────────────────────────────────────
+pymupdf>=1.24.0
+
+# ── Utilidades ────────────────────────────────────────────────────────────────
+python-dotenv>=1.0.0

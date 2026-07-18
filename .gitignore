@@ -1,0 +1,23 @@
+# ── Variables de entorno (NUNCA subir al repo) ────────────────────────────────
+.env
+
+# ── Índice FAISS generado localmente ─────────────────────────────────────────
+db/
+
+# ── Caché de modelos HuggingFace ─────────────────────────────────────────────
+.cache/
+__pycache__/
+*.pyc
+*.pyo
+
+# ── IDEs ──────────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+
+# ── Python environments ───────────────────────────────────────────────────────
+venv/
+.venv/
+env/
+
+# ── Streamlit ─────────────────────────────────────────────────────────────────
+.streamlit/secrets.toml
