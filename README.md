@@ -1,30 +1,23 @@
-# 🏥 MedQuery AI: Asistente Clínico Inteligente (RAG)
+# MedQuery AI: Asistente Clínico de Consulta (RAG)
 
-**La información médica correcta, al alcance de una pregunta.**
+MedQuery AI es un asistente de búsqueda y consulta basado en la arquitectura RAG (Retrieval-Augmented Generation) diseñado para facilitar la gestión del conocimiento en clínicas e instituciones de salud. Permite al personal médico y administrativo consultar protocolos internos, normativas sanitarias y manuales de procedimientos mediante consultas en lenguaje natural.
 
-MedQuery AI es un asistente inteligente basado en Inteligencia Artificial y arquitectura **RAG (Retrieval-Augmented Generation)** diseñado para la gestión eficiente del conocimiento en clínicas y centros de salud de alta complejidad. Permite al personal médico y administrativo consultar protocolos internos, normativas sanitarias y manuales de procedimientos de forma instantánea mediante lenguaje natural.
+El sistema procesa documentos en formato PDF, genera embeddings vectoriales mediante modelos de Hugging Face, almacena localmente la información en un índice FAISS y utiliza la API de Groq para la generación de respuestas precisas basadas estrictamente en la documentación provista.
 
-El sistema procesa archivos PDF institucionales, genera embeddings vectoriales precisos utilizando modelos de **Hugging Face**, almacena la información localmente en un índice **FAISS** y utiliza la API de **Groq** como modelo de lenguaje de alta velocidad para responder consultas críticas sin riesgo de alucinaciones.
+## URL de la Aplicación (Despliegue Público)
 
----
+La plataforma se encuentra disponible en el siguiente enlace:
+**[Enlace de Streamlit Cloud](AQUÍ_VA_TU_ENLACE_DE_STREAMLIT_CLOUD)**
 
-## 🌐 URL de la Aplicación (Deploy Público)
-La plataforma se encuentra desplegada y disponible para pruebas en producción aquí:
-👉 **[AQUÍ_VA_TU_ENLACE_DE_STREAMLIT_CLOUD]**
+## Características Principales
 
----
+*   **Búsqueda semántica:** Permite realizar consultas en lenguaje natural sin requerir coincidencias exactas de palabras clave.
+*   **Baja latencia:** Respuestas rápidas gracias al motor de inferencia de Groq.
+*   **Mitigación de alucinaciones:** Generación de respuestas basada exclusivamente en el contexto del documento consultado.
+*   **Interfaz simplificada:** Diseñada con componentes nativos de Streamlit, priorizando la facilidad de uso clínico.
+*   **Arquitectura modular:** La base documental puede actualizarse reemplazando o añadiendo archivos PDF en el directorio correspondiente.
 
-## 🔥 Características principales
-
-- 🩺 **Búsqueda Semántica Médica:** Consultas en lenguaje natural sin necesidad de coincidencia exacta de palabras clave.
-- ⚡ **Respuestas en Tiempo Real:** Infraestructura ultra rápida gracias al motor de inferencia de Groq.
-- 🔒 **Garantía Anti-Alucinaciones:** Respuestas basadas estricta y únicamente en el contexto documental proveído.
-- 💻 **Interfaz Minimalista y Funcional:** Desarrollada con componentes nativos de Streamlit, priorizando la usabilidad médica sobre la estética pesada.
-- 🔁 **Arquitectura Reutilizable:** Diseñado como un motor agnóstico; basta con cambiar los PDFs de la base documental para adaptarlo a cualquier otra especialidad médica o institución.
-
----
-
-## 🏗️ Arquitectura de la Solución
+## Arquitectura de la Solución
 
 ```text
                Personal Médico / Administrativo
@@ -49,26 +42,20 @@ La plataforma se encuentra desplegada y disponible para pruebas en producción a
                               │
                               ▼
                  Respuesta Validada al Usuario
-
 ```
 
----
+## Tecnologías Utilizadas
 
-## 🛠️ Tecnologías y Herramientas
+*   **Lenguaje:** Python 3.11
+*   **Orquestación:** LangChain
+*   **Base de Datos Vectorial:** FAISS
+*   **Embeddings:** Hugging Face (`all-MiniLM-L6-v2`)
+*   **Modelo de Lenguaje (LLM):** Groq API (`llama3-8b-8192`)
+*   **Interfaz Gráfica:** Streamlit
+*   **Procesamiento de Archivos:** PyMuPDF (`fitz`)
+*   **Despliegue:** Streamlit Community Cloud
 
-* **Lenguaje:** Python 3.11
-* **IDE de Desarrollo:** Antigravity IDE (Claude Sonnet)
-* **Orquestación:** LangChain
-* **Base de Datos Vectorial:** FAISS
-* **Embeddings:** Hugging Face (`all-MiniLM-L6-v2`)
-* **Modelo de Lenguaje (LLM):** Groq API (`llama3-8b-8192`)
-* **Frontend:** Streamlit
-* **Procesamiento de Archivos:** PyMuPDF (`fitz`)
-* **Despliegue:** Streamlit Community Cloud
-
----
-
-## 🗂️ Estructura del Proyecto
+## Estructura del Proyecto
 
 ```text
 medquery-ai/
@@ -86,19 +73,15 @@ medquery-ai/
 ├── requirements.txt    # Dependencias del entorno de Python
 ├── README.md           # Documentación del repositorio
 └── .env.example        # Plantilla para variables de entorno locales
-
 ```
 
----
-
-## ⚙️ Instrucciones de Instalación y Ejecución Local
+## Instalación y Configuración Local
 
 ### 1. Clonar el repositorio
 
 ```bash
-git clone [https://github.com/tu-usuario/medquery-ai.git](https://github.com/tu-usuario/medquery-ai.git)
+git clone https://github.com/tu-usuario/medquery-ai.git
 cd medquery-ai
-
 ```
 
 ### 2. Crear y activar el entorno virtual
@@ -109,74 +92,60 @@ python -m venv .venv
 .venv\Scripts\activate
 # En Mac/Linux:
 source .venv/bin/activate
-
 ```
 
-### 3. Instalar las dependencias del proyecto
+### 3. Instalar las dependencias
 
 ```bash
 pip install -r requirements.txt
-
 ```
 
-### 4. Configurar variables de entorno
+### 4. Configurar las variables de entorno
 
-Crea un archivo llamado `.env` en la raíz del proyecto tomando como referencia `.env.example`:
+Cree un archivo llamado `.env` en la raíz del proyecto basándose en `.env.example`:
 
 ```text
 GROQ_API_KEY=TU_API_KEY_DE_GROQ_AQUÍ
-
 ```
 
-### 5. Indexar la documentación institucional
+### 5. Indexar la documentación
 
-Coloca los archivos PDF con los protocolos o normativas dentro de la carpeta `protocols_pdf/` y ejecuta el script para generar la base de conocimientos indexada:
+Coloque los archivos PDF con los protocolos o normativas dentro del directorio `protocols_pdf/` y ejecute el script de indexación para construir la base de conocimiento vectorial:
 
 ```bash
 python indexar_datos.py
-
 ```
 
 ### 6. Ejecutar la aplicación
 
 ```bash
 streamlit run app.py
-
 ```
 
----
+## Ejemplos de Uso
 
-## 💡 Ejemplos de Interacción (Validación del Agente)
+**Consultas de ejemplo:**
 
-**Consultas frecuentes del personal de salud:**
+*   *¿Cuál es el protocolo de triaje para pacientes con síntomas respiratorios agudos?*
+*   *¿Qué pasos se deben seguir en caso de un pinchazo accidental con aguja?*
+*   *¿Cuáles son los requisitos de ingreso para una cirugía programada?*
 
-* *"¿Cuál es el protocolo de triaje para pacientes con síntomas respiratorios agudos?"* 🚨
-* *"¿Qué pasos se deben seguir en caso de un pinchazo accidental con aguja?"* 💉
-* *"¿Cuáles son los requisitos de ingreso para una cirugía programada?"* 📝
-
-**Ejemplo de flujo de respuesta real:**
+**Ejemplo de flujo de consulta:**
 
 > **Usuario:** ¿Cómo se procede ante una sospecha de paro cardiorrespiratorio en sala de espera?
-> **MedQuery AI:** De acuerdo con la Sección 2.1 del *Manual de Emergencias de la Clínica (2025)*, se debe activar inmediatamente el 'Código Azul'. El personal de enfermería más cercano debe iniciar compunciones torácicas y solicitar el desfibrilador externo automático (DEA) en un tiempo menor a 60 segundos mientras arriba el equipo de reanimación. ⏱️
+>
+> **MedQuery AI:** De acuerdo con la Sección 2.1 del *Manual de Emergencias de la Clínica (2025)*, se debe activar inmediatamente el 'Código Azul'. El personal de enfermería más cercano debe iniciar compresiones torácicas y solicitar el desfibrilador externo automático (DEA) en un tiempo menor a 60 segundos mientras arriba el equipo de reanimación.
 
----
+## Despliegue
 
-## 🚀 Despliegue
+La aplicación está preparada para ser desplegada en Streamlit Community Cloud. El procesamiento y fragmentación de los documentos se realiza de manera local para resguardar la privacidad de los datos institucionales, mientras que las consultas en producción se resuelven mediante llamadas a la API de Groq utilizando variables de entorno seguras configuradas en la plataforma de Streamlit.
 
-La aplicación se encuentra desplegada en **Streamlit Community Cloud**, conectada directamente a este repositorio de GitHub. El procesamiento y fragmentación de los documentos se realiza de manera local/estática para resguardar la privacidad de los manuales institucionales, mientras que la consulta se resuelve mediante llamadas seguras a la API de Groq utilizando variables de entorno protegidas (*Secrets*).
+## Autor
 
----
+*   **[Tu Nombre Aquí]** - Desarrollador del proyecto.
+*   [Perfil de GitHub](https://github.com/tu-usuario)
 
-## 👤 Autor
+## Licencia
 
-**[Tu Nombre Aquí]**
+Este proyecto fue desarrollado con fines educativos y de validación técnica. Los documentos utilizados en la demostración son simulados y con fines ilustrativos.
 
-*Desarrollador de Soluciones de IA | Proyecto de Startup Ficticia*
-
-[🔗 Visita mi perfil en GitHub](https://www.google.com/search?q=https://github.com/tu-usuario)
-
----
-
-## 📄 Licencia
-
-Este proyecto fue desarrollado con fines educativos dentro del marco del Challenge Alura Agente. Los documentos utilizados en la demostración son de carácter ficticio/simulado para la validación de la tecnología RAG.
