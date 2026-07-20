@@ -141,7 +141,8 @@ def _get_indexed_doc_names() -> list[str]:
     pkl_path = DB_PATH / "index.pkl"
     if not pkl_path.exists():
         return []
-    data     = pickle.load(open(pkl_path, "rb"))
+    with open(pkl_path, "rb") as f:
+        data = pickle.load(f)
     docstore = data[0]
     docs     = list(docstore._dict.values())
     return sorted(set(

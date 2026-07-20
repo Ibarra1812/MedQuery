@@ -142,17 +142,28 @@ python -m streamlit run app.py
 
 ## Ejemplos de Uso
 
-**Consultas de ejemplo:**
+**Consultas de ejemplo que el agente puede resolver:**
 
+*   _"¿Cuáles son los criterios del Score CURB-65 para evaluar la severidad de la neumonía?"_ 📋
 *   _"¿Cuál es el protocolo de triaje para pacientes con síntomas respiratorios agudos?"_ 🚨
-*   _"¿Qué pasos se deben seguir en caso de un pinchazo accidental con aguja?"_ 💉
-*   _"¿Cuáles son los requisitos de ingreso para una cirugía programada?"_ 📝
+*   _"¿Cómo se define el plan de contención de un paciente con agitación psicomotriz?"_ 👥
 
 **Flujo de respuesta real:**
 
-> **Usuario:** ¿Cómo se procede ante una sospecha de paro cardiorrespiratorio en sala de espera?
+> **Usuario:** ¿Cuáles son los criterios del Score CURB-65 para evaluar la severidad de la neumonía?
 >
-> **MedQuery AI:** De acuerdo con la Sección 2.1 del *Manual de Emergencias de la Clínica (2025)*, se debe activar inmediatamente el 'Código Azul'. El personal de enfermería más cercano debe iniciar compresiones torácicas y solicitar el desfibrilador externo automático (DEA) en un tiempo menor a 60 segundos mientras arriba el equipo de reanimación. ⏱️
+> **MedQuery AI:** El Score CURB-65 es un sistema utilizado para evaluar la severidad de la neumonía adquirida en la comunidad (NAC) en adultos. Los criterios del Score CURB-65 son los siguientes:
+> 
+> 1. **Confusión**: Alteración aguda del nivel de conciencia o desorientación en tiempo, espacio o persona.
+> 2. **Urea**: Concentración de urea en sangre superior a 7 mmol/L (o nitrógeno ureico en sangre - BUN > 19 mg/dL).
+> 3. **Respiración**: Frecuencia respiratoria igual o mayor a 30 respiraciones por minuto.
+> 4. **Presión arterial**: Presión arterial sistólica < 90 mmHg o presión arterial diastólica ≤ 60 mmHg.
+> 5. **Edad**: Edad del paciente igual o mayor a 65 años.
+> 
+> Para cada uno de estos criterios, se asigna un punto. El puntaje total puede variar de 0 a 5 puntos. El puntaje se utiliza para determinar la severidad de la neumonía y guiar la toma de decisiones clínicas. ⏱️
+> 
+> *Ref: URG_score_curb65_neumonia_v1*
+
 
 ---
 
